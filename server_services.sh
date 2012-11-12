@@ -15,11 +15,11 @@ doozerd -timeout 5 -l '71.19.149.234:8046' -w '71.19.149.234:8080' -c 'skynet' -
 sleep 1.5
 
 # Start skynet daemon
-~/src/gocode/src/github.com/bketelsen/skynet/cmd/skydaemon/skydaemon --version=1 0<&- &> ~/log/skynet_daemon.log &
+~/src/gocode/src/github.com/bketelsen/skynet/cmd/skydaemon/skydaemon -l '71.19.149.234:9000' --version=1 0<&- &> ~/log/skynet_daemon.log &
 sleep 1.5
 
 # Dasbboard
-~/src/gocode/src/github.com/bketelsen/skynet/cmd/dashboard/dashboard  -addr 71.19.149.234:8090 --webroot=/home/leo/src/gocode/src/github.com/bketelsen/skynet/cmd/dashboard 0<&- &> ~/log/skynet_dashboard.log &
+~/src/gocode/src/github.com/bketelsen/skynet/cmd/dashboard/dashboard -d -addr 71.19.149.234:8090 --webroot=/home/leo/src/gocode/src/github.com/bketelsen/skynet/cmd/dashboard 0<&- &> ~/log/skynet_dashboard.log &
 
 # Now can deploy in sky cli:
 # deploy github.com/bketelsen/skynet/examples/testing/fibonacci/fibservice --version=2
