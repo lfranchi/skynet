@@ -1,13 +1,19 @@
 # Build / Test skylib
-go build && go test
+go build
 
 # Build / Test sky
-cd sky && go build && go test
-cd ..
-
-# Build / Test examples
-cd examples/client && go build && go test
+cd cmd/sky && go build
 cd ../../
 
-cd examples/service && go build && go test
+cd cmd/skydaemon && go build
+cd ../../
+
+cd cmd/dashboard && go build
+cd ../../
+
+# Build / Test examples
+cd examples/client && go build
+cd ../../
+
+cd examples/service && go build
 cd ../../
