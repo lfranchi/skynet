@@ -108,20 +108,23 @@ type MongoConfig struct {
 }
 
 type ServiceConfig struct {
-	Log                  SemanticLogger `json:"-"`
-	UUID                 string
-	Name                 string
-	Version              string
-	Region               string
-	ServiceAddr          *BindAddr
-	AdminAddr            *BindAddr
-	DoozerConfig         *DoozerConfig `json:"-"`
-	DoozerUpdateInterval time.Duration `json:"-"`
-	MongoConfig          *MongoConfig  `json:"-"`
+	Log                         SemanticLogger `json:"-"`
+	UUID                        string
+	Name                        string
+	Version                     string
+	Region                      string
+	ServiceAddr                 *BindAddr
+	AdminAddr                   *BindAddr
+	DoozerConfig                *DoozerConfig `json:"-"`
+	DoozerUpdateInterval        time.Duration `json:"-"`
+	MongoConfig                 *MongoConfig  `json:"-"`
+	CriticalClientCount         int32
+	CriticalAverageResponseTime time.Duration
 }
 
 type ClientConfig struct {
 	Region                    string
+	Host                      string
 	Log                       SemanticLogger `json:"-"`
 	DoozerConfig              *DoozerConfig  `json:"-"`
 	IdleConnectionsToInstance int
@@ -168,6 +171,7 @@ func FlagsForClient(ccfg *ClientConfig, flagset *flag.FlagSet) {
 	flagset.IntVar(&ccfg.IdleConnectionsToInstance, "maxidle", DefaultIdleConnectionsToInstance, "maximum number of idle connections to a particular instance")
 	flagset.IntVar(&ccfg.MaxConnectionsToInstance, "maxconns", DefaultMaxConnectionsToInstance, "maximum number of concurrent connections to a particular instance")
 	flagset.StringVar(&ccfg.Region, "region", GetDefaultEnvVar("SKYNET_REGION", DefaultRegion), "region client is located in")
+	flagset.StringVar(&ccfg.Region, "host", GetDefaultEnvVar("SKYNET_HOST", DefaultRegion), "host client is located in")
 }
 
 func GetClientConfig() (config *ClientConfig, args []string) {
@@ -253,4 +257,38 @@ func GetServiceConfigFromFlags(argv []string) (config *ServiceConfig, args []str
 	FlagsForService(config, flagset)
 
 	return ParseServiceFlags(config, flagset, argv)
+}
+
+func getFlagName(f string) (name string) {
+	if f[0] == '-' {
+		minusCount := 1
+
+		if f[1] == '-' {
+			minusCount++
+		}
+
+		f = f[minusCount:]
+
+		for i := 0; i < len(f); i++ {
+			if f[i] == '=' || f[i] == ' ' {
+				break
+			}
+
+			name += string(f[i])
+		}
+	}
+
+	return
+}
+
+func SplitFlagsetFromArgs(flagset *flag.FlagSet, args []string) (flagsetArgs []string, additionalArgs []string) {
+	for _, f := range args {
+		if flagset.Lookup(getFlagName(f)) != nil {
+			flagsetArgs = append(flagsetArgs, f)
+		} else {
+			additionalArgs = append(additionalArgs, f)
+		}
+	}
+
+	return
 }

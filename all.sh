@@ -1,19 +1,56 @@
+function build {
+  d=`pwd`
+
+  cd $1
+  go build && go test
+  cd $d
+}
+
 # Build / Test skylib
-go build
+build .
+
+# Build Client
+build client
+
+# Build Service
+build service
+
+# Build Daemon
+build daemon
+
+# Build Pools
+build pools
+
+# Test helpers
+build skytest
+
+# Build RPC
+build rpc/bsonrpc
 
 # Build / Test sky
-cd cmd/sky && go build
-cd ../../
+build cmd/sky
 
-cd cmd/skydaemon && go build
-cd ../../
+# Build / Test dashboard
+build cmd/dashboard
 
-cd cmd/dashboard && go build
-cd ../../
+# Build / Test skydaemon
+build cmd/skydaemon
 
 # Build / Test examples
-cd examples/client && go build
-cd ../../
+build examples/client
 
-cd examples/service && go build
-cd ../../
+build examples/service
+
+build examples/tutorial/client
+
+build examples/tutorial/service
+
+build examples/testing/fibonacci/fibclient
+
+build examples/testing/fibonacci/fibservice
+
+build examples/testing/sleeper/sleepclient
+
+build examples/testing/sleeper/sleepservice
+
+build examples/testing/vagranttests
